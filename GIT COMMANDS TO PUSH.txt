@@ -1,0 +1,6 @@
+cd "D:/Projects/Demo Projects/Login_React_With_WebAPI"
+
+git status        # see what changed
+git add .         # stage all changes (client + server + others)
+git commit -m "Updated client/server changes"
+git push
