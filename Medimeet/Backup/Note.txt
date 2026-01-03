@@ -1,0 +1,153 @@
+A web app where patients can discover 
+============================================================================================
+features - 
+view available time slots, 
+book appointments
+Doctors manage their calendars (clinic hours, breaks, leaves)
+admins oversee the whole system.
+============================================================================================
+valoidations -
+double-booking, 
+clinic hours vs. doctor availability, 
+buffer times, 
+last-minute cancellations.
+============================================================================================
+Key Features-
+Patient signup
+patient login (JWT), profile
+Doctor profiles (specialization, fees, clinic locations)
+SmartSlot™ generator (unique logic): produces bookable slots from working hours + breaks + buffer + already-booked + doctor leave + per-slot capacity
+Real-time conflict-free booking (DB-level unique index)
+Appointment lifecycle: Book → Confirm → Cancel/Reschedule
+Doctor dashboard (today’s schedule, next patient)
+Admin panel (manage doctors, specialties, clinics)
+Email template hooks (optional)
+Audit logs (simple)
+============================================================================================
+pakage install - 
+dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
+dotnet add package FluentValidation
+dotnet add package FluentValidation.AspNetCore
+dotnet add package BCrypt.Net-Next
+dotnet add package microsoft.entityframeworkcore
+dotnet add package microsoft.entityframeworkcore.tools
+dotnet add package Microsoft.EntityFrameworkCore.Design
+============================================================================================
+generate key 
+[guid]::NewGuid().ToString("N") + [guid]::NewGuid().ToString("N")
+============================================================================================
+frontend - react vite setup -
+cd ..
+npm create vite@latest doctorapp-web -- --template react
+cd doctorapp-web
+npm install
+npm install axios react-router-dom
+npm run dev
+============================================================================================
+Functionality List (What we’ll build) - 
+
+Auth (JWT)-done
+Register (Patient/Doctor)-done
+Login, token storage, protected routes-done
+Doctors-done
+Search by name/specialization
+Profile with fee, bio, clinics
+Clinics
+Address, association with doctors
+Doctor Schedules
+Working hours per day (start/end, slot length, buffer)
+Breaks (e.g., lunch)
+Leaves (full or partial day)
+SmartSlot™
+Generates availability for a date by combining working hours, breaks, leaves, and existing bookings.
+Respects buffer times to avoid back-to-back crowding.
+Appointments
+Patient can book, view, cancel
+Double booking impossible via DB unique index (DoctorId, StartUtc)
+Dashboards
+Doctor: today’s schedule & upcoming patients
+Patient: my appointments
+Admin (phase 2)
+Manage doctors, clinics, specialties
+(Optional)
+Email/SMS reminders
+Online/offline consult types
+Payments integration (mock first)
+============================================================================================
+Process flow - 
+
+🔹 Process Flow of the Project
+1. User Onboarding
+Patient registers → enters name, email, password → system stores in DB → returns JWT token for authentication.
+Doctor registers (or admin creates doctor profile) → enters specialization, fees, clinic location, working hours.
+Admin is a super-user who can add/remove doctors, clinics, and manage data.
+
+2. Doctor Schedule Setup
+Doctor defines:
+Working hours (e.g., Mon–Fri, 10am–2pm & 5pm–8pm).
+Breaks (e.g., lunch 2–5pm).
+Buffer time (e.g., 10 mins gap between patients).
+Leaves / holidays (e.g., not available on 25 Aug).
+Slot capacity (e.g., max 2 patients per slot for group sessions).
+⚡ Here the SmartSlot™ Generator runs and calculates all available slots based on the above rules.
+These slots are saved/cached so patients only see conflict-free times.
+
+3. Patient Browsing & Booking
+Patient searches doctor by specialization (e.g., “Dermatologist”).
+Selects doctor → sees profile, fees, clinic location, and available slots (from SmartSlot).
+Patient picks a time slot → system checks in DB if:
+Slot is free
+Doctor not on leave
+Not already booked (DB unique index check)
+✅ If free → Booking created.
+❌ If conflict → Error returned instantly.
+
+4. Appointment Lifecycle
+Book: Patient books → status = "Booked".
+Confirm: Doctor (or auto-confirm) marks it confirmed → status = "Confirmed".
+Cancel: Patient or Doctor cancels → slot becomes free again.
+Reschedule: Patient requests → selects another slot → old one freed.
+
+5. Dashboards
+Doctor Dashboard:
+Today’s schedule (list of patients, times, status).
+Next upcoming patient.
+Option to mark attended / missed.
+Patient Dashboard:
+My appointments (Booked, Confirmed, Cancelled).
+Option to cancel/reschedule.
+Admin Dashboard:
+Manage doctors, clinics, specialties.
+Monitor bookings, cancellations.
+Audit logs (who did what & when).
+
+6. Notifications (optional but useful)
+Email / SMS hooks:
+Appointment booked → patient & doctor notified.
+Reminder before appointment.
+Cancellation/reschedule alerts.
+
+7. Audit Logs
+Every action (login, booking, cancellation, reschedule) gets logged → useful for debugging & tracking.
+🔹 In Short (End-to-End Journey)
+Doctor sets availability → SmartSlot generates valid slots.
+Patient signs up → searches doctor → picks slot.
+System validates & books without conflicts.
+Appointment goes through lifecycle (Book → Confirm → Cancel/Reschedule).
+Dashboards keep doctors, patients, and admins updated.
+Notifications + logs keep the process smooth and transparent.
+
+👉 So overall, the core engine is SmartSlot™ + conflict-free DB booking, and the rest (dashboards, notifications, logs) are supporting modules.
+
+===========================================================================================
+
+
+
+
+
+
+
+
+
+
